@@ -1,0 +1,95 @@
+[gd_scene load_steps=14 format=3 uid="uid://b7suf8grnwcgu"]
+
+[ext_resource type="Texture2D" uid="uid://isfgpw1fxa85" path="res://oak_veneer_01_diff_4k.jpg" id="1_e2o6t"]
+[ext_resource type="Script" uid="uid://csi6owilhpheg" path="res://game.gd" id="1_fc0e3"]
+[ext_resource type="Texture2D" uid="uid://bwlkmccajdbdk" path="res://square_tiles_03_ao_4k.png" id="2_e2o6t"]
+[ext_resource type="PackedScene" uid="uid://uck7wynv6wx6" path="res://gui.tscn" id="3_feb5d"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_feb5d"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fc0e3"]
+albedo_texture = ExtResource("1_e2o6t")
+normal_texture = SubResource("CompressedTexture2D_feb5d")
+
+[sub_resource type="Environment" id="Environment_7jktm"]
+ambient_light_source = 1
+ambient_light_energy = 0.0
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_ryrav"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7jktm"]
+albedo_texture = ExtResource("2_e2o6t")
+uv1_scale = Vector3(0.1, 0.1, 0.1)
+uv1_triplanar = true
+
+[sub_resource type="Curve3D" id="Curve3D_ryrav"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 1.49842, 0.192336, -0.769986, 0, 0, 0, 0, 0, 0, -1.498, 0.192, -0.77),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+up_vector_enabled = false
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ryrav"]
+metallic = 1.0
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eow3j"]
+albedo_color = Color(1, 0.603922, 1, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_j5wjh"]
+material = SubResource("StandardMaterial3D_eow3j")
+size = Vector2(1, 0.6)
+
+[node name="Game" type="Node3D"]
+script = ExtResource("1_fc0e3")
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.280851, 0.959751, 0, -0.959751, 0.280851, 0, 2.93976, 0.917395)
+fov = 37.8493
+
+[node name="Table" type="CSGBox3D" parent="."]
+size = Vector3(3, 0.25, 2)
+material = SubResource("StandardMaterial3D_fc0e3")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_7jktm")
+camera_attributes = SubResource("CameraAttributesPractical_ryrav")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.642841, 0.427721, -0.635461, 0, 0.829584, 0.558382, 0.766, -0.358951, 0.533291, -5.61713, 8.50939, 4.28575)
+
+[node name="Floor" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.8, 0)
+size = Vector3(100, 0.001, 100)
+material = SubResource("StandardMaterial3D_7jktm")
+
+[node name="Path" type="Path3D" parent="."]
+curve = SubResource("Curve3D_ryrav")
+
+[node name="PathFollow3D" type="PathFollow3D" parent="Path"]
+transform = Transform3D(4.60545e-06, -0.000112131, 1, 3.63798e-12, 1, 0.000112131, -1, -5.12776e-10, 4.60545e-06, 0.000210114, 0.192168, -0.769993)
+progress = 1.49821
+loop = false
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="Path/PathFollow3D"]
+transform = Transform3D(4.60545e-06, -3.63798e-12, -1, -0.000111972, 1, -5.19319e-10, 1, 0.000111972, 4.60545e-06, -0.769993, 0.680051, -0.000129177)
+operation = 2
+radius = 0.1
+material = SubResource("StandardMaterial3D_ryrav")
+
+[node name="Lamp" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.53481, 0)
+light_color = Color(1, 0.596078, 0.211765, 1)
+
+[node name="GUI" parent="." instance=ExtResource("3_feb5d")]
+
+[node name="Card" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.135115, 0.354682)
+mesh = SubResource("PlaneMesh_j5wjh")
+
+[node name="Text" type="Label3D" parent="Card"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.011062, 0)
+shaded = true
+double_sided = false
+text = "Text"

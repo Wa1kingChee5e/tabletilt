@@ -1,0 +1,29 @@
+# LANGUAGE translation for tilt and shout for the following files:
+# res://gui.tscn
+# res://main_menu.tscn
+#
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: tilt and shout\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8-bit\n"
+
+#: gui.tscn
+msgid "Left player won!"
+msgstr ""
+
+#: gui.tscn
+msgid "Right player won!"
+msgstr ""
+
+#: main_menu.tscn
+msgid "Play?"
+msgstr ""
+
+#: main_menu.tscn
+msgid "Main Menu?"
+msgstr ""
