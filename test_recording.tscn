@@ -1,0 +1,63 @@
+[gd_scene load_steps=6 format=3 uid="uid://bonrv0ulp0bi0"]
+
+[ext_resource type="WhisperResource" uid="uid://bo6c3kondu4v" path="res://addons/godot_whisper/models/gglm-tiny.en.bin" id="1_jvjjr"]
+[ext_resource type="Script" uid="uid://tj0fay56f463" path="res://addons/godot_whisper/capture_stream_to_text.gd" id="2_0uy2d"]
+[ext_resource type="Script" uid="uid://xk3paj0nx4s8" path="res://addons/godot_whisper/label_transcribe.gd" id="3_chevy"]
+
+[sub_resource type="GDScript" id="GDScript_0uy2d"]
+script/source = "extends Node2D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	var a = AudioServer.get_input_device_list()
+	for i in a:
+		$ItemList.add_item(i)
+
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+
+func _on_item_list_item_selected(index: int) -> void:
+	var a = AudioServer.get_input_device_list()
+	AudioServer.input_device = a[index]
+"
+
+[sub_resource type="AudioStreamMicrophone" id="AudioStreamMicrophone_jvjjr"]
+
+[node name="Node2D" type="Node2D"]
+script = SubResource("GDScript_0uy2d")
+
+[node name="SpeechToText" type="SpeechToText" parent="."]
+language_model = ExtResource("1_jvjjr")
+script = ExtResource("2_0uy2d")
+transcribe_interval = 0.2
+minimum_sentence_time = 1
+maximum_sentence_time = 5
+halucinating_count = 10
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamMicrophone_jvjjr")
+autoplay = true
+bus = &"Record"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+offset_left = 163.0
+offset_top = 95.0
+offset_right = 949.0
+offset_bottom = 511.0
+script = ExtResource("3_chevy")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
+[node name="ItemList" type="ItemList" parent="."]
+offset_left = 1013.0
+offset_top = 37.0
+offset_right = 1130.0
+offset_bottom = 79.0
+
+[connection signal="transcribed_msg" from="SpeechToText" to="RichTextLabel" method="_on_speech_to_text_transcribed_msg"]
+[connection signal="item_selected" from="ItemList" to="." method="_on_item_list_item_selected"]

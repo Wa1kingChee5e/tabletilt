@@ -1,0 +1,112 @@
+[gd_scene load_steps=3 format=3 uid="uid://b5gt5sao0gsfd"]
+
+[sub_resource type="GDScript" id="GDScript_nknm7"]
+script/source = "extends Node2D
+
+var key : String
+var http : HTTPRequest
+var model := 'llama-3.1-8b-instant'
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	http = $HTTPRequest # Replace with function body.
+	
+	var file = FileAccess.open(\"res://key.txt\",FileAccess.READ)
+	key = file.get_as_text()
+	file.close()
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass  # !
+
+
+func _on_button_pressed() -> void:
+	var request = $Control/TextEdit.text
+	http.request(
+		\"https://api.groq.com/openai/v1/chat/completions\",
+		PackedStringArray([\"Authorization: Bearer \"+key.substr(0,key.length()-1),\"Content-Type: application/json\"]),
+		HTTPClient.Method.METHOD_POST,
+		'{\"model\": \"'+model+'\",\"messages\": [{\"role\": \"user\",\"content\": \"'+request.replace(\"\\n\", \" \")+'\"}]}'
+	)
+
+func _on_http_request_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray) -> void:
+	print(result)
+	print(response_code)
+	print(headers)
+	#print(body)
+	print()
+	var json = JSON.parse_string(body.get_string_from_utf8())
+	print(json)
+	if json == null:
+		$Control/Label.text = \"Shit!1!!\"
+		print(\"shit!\")
+		return
+	if json.keys().has(\"error\"):
+		$Control/Label.text = json[\"error\"][\"message\"]
+		return
+	$Control/Label.text = json[\"choices\"][0][\"message\"][\"content\"]# Replace with function body.
+"
+
+[sub_resource type="LabelSettings" id="LabelSettings_6quyq"]
+shadow_color = Color(0, 0, 0, 0.898039)
+
+[node name="Node2D" type="Node2D"]
+script = SubResource("GDScript_nknm7")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -2.0
+offset_top = -1.0
+offset_right = 1149.0
+offset_bottom = 645.0
+
+[node name="TextEdit" type="TextEdit" parent="Control"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.016
+anchor_top = 0.081
+anchor_right = 0.979
+anchor_bottom = 0.284
+offset_left = -0.416
+offset_top = -0.164001
+offset_right = 0.171021
+offset_bottom = 0.103989
+grow_horizontal = 2
+text = "Groq Request"
+placeholder_text = "Groq Request"
+
+[node name="Label" type="Label" parent="Control"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 44.0
+offset_top = -173.0
+offset_right = -35.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Groq Response"
+label_settings = SubResource("LabelSettings_6quyq")
+autowrap_mode = 2
+
+[node name="Button" type="Button" parent="Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -31.5
+offset_top = -15.5
+offset_right = 31.5
+offset_bottom = 15.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Submit"
+
+[connection signal="request_completed" from="HTTPRequest" to="." method="_on_http_request_request_completed"]
+[connection signal="pressed" from="Control/Button" to="." method="_on_button_pressed"]

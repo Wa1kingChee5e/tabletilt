@@ -15,6 +15,21 @@ run/main_scene="uid://btpyb8jh1ffcq"
 config/features=PackedStringArray("4.4", "Mobile")
 config/icon="res://icon.svg"
 
+[audio]
+
+buses/default_bus_layout="uid://c7qssboiglgv4"
+driver/enable_input=true
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_whisper/plugin.cfg")
+
+[file_customization]
+
+folder_colors={
+"res://addons/": "orange"
+}
+
 [filesystem]
 
 import/blender/enabled=false

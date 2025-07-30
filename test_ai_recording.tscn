@@ -1,0 +1,143 @@
+[gd_scene load_steps=6 format=3 uid="uid://bdhgej0qvfwho"]
+
+[ext_resource type="WhisperResource" uid="uid://dmxcg6l5hedo6" path="res://addons/godot_whisper/models/gglm-base.en.bin" id="1_6bomn"]
+[ext_resource type="Script" uid="uid://xk3paj0nx4s8" path="res://addons/godot_whisper/label_transcribe.gd" id="1_m01vt"]
+[ext_resource type="Script" uid="uid://tj0fay56f463" path="res://addons/godot_whisper/capture_stream_to_text.gd" id="1_pghec"]
+
+[sub_resource type="GDScript" id="GDScript_6bomn"]
+script/source = "extends Node2D
+
+var key : String
+var http
+var output : RichTextLabel
+var input : RichTextLabel
+var audio
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	http = $HTTPRequest # Replace with function body.
+	output = $Control/Output
+	input = $Control/Input
+	audio = $Control/Audio
+	key = FileAccess.get_file_as_string(\"res://key.txt\")
+	var a = AudioServer.get_input_device_list()
+	for i in a:
+		audio.add_item(i)
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+
+func _on_clear_pressed() -> void:
+	input.text = \"\"
+	input.completed_text = \"\"
+	input.partial_text = \"\"
+
+
+func _on_submit_pressed() -> void:
+	print(\"\\n----SUBMITTED----\\n\")
+	var request = input.completed_text
+	http.request(
+		\"https://api.groq.com/openai/v1/chat/completions\",
+		PackedStringArray(
+			[
+				\"Authorization: Bearer \" + key.substr(0,key.length()-1),
+			]
+		),
+		HTTPClient.Method.METHOD_POST,
+		'{
+\"model\": \"llama-3.3-70b-versatile\",
+\"messages\": [{
+	\"role\": \"user\",
+	\"content\":\"'+  request + '\"
+},
+{
+	\"role\": \"system\",
+	\"content\":\"Be helpful. Use only [b][/b] for bold text. Use only [i][/i] for italic. You will be punished for usage of any other formatting symbols.\"
+}
+]
+}'
+	)
+
+func _on_http_request_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray) -> void:
+	var json = JSON.parse_string(body.get_string_from_utf8())
+	print(json)
+	output.clear()
+	if json.keys().has(\"error\"):
+		output.add_text(json[\"error\"][\"message\"])
+		return
+	output.append_text(json[\"choices\"][0][\"message\"][\"content\"])
+
+
+func _on_audio_item_selected(index: int) -> void:
+	var a = AudioServer.get_input_device_list()
+	AudioServer.input_device = a[index]
+"
+
+[sub_resource type="AudioStreamMicrophone" id="AudioStreamMicrophone_6bomn"]
+
+[node name="test_ai_recording" type="Node2D"]
+script = SubResource("GDScript_6bomn")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
+[node name="SpeechToText" type="SpeechToText" parent="."]
+language_model = ExtResource("1_6bomn")
+script = ExtResource("1_pghec")
+transcribe_interval = 0.2
+minimum_sentence_time = 1
+maximum_sentence_time = 10
+halucinating_count = 3
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+
+[node name="Audio" type="ItemList" parent="Control"]
+offset_left = 432.0
+offset_top = 20.0
+offset_right = 688.0
+offset_bottom = 60.0
+
+[node name="Submit" type="Button" parent="Control"]
+offset_left = 517.0
+offset_top = 509.0
+offset_right = 614.0
+offset_bottom = 551.0
+text = "Submit"
+
+[node name="Clear" type="Button" parent="Control"]
+offset_left = 516.0
+offset_top = 555.0
+offset_right = 609.0
+offset_bottom = 592.0
+text = "Clear"
+
+[node name="Input" type="RichTextLabel" parent="Control"]
+offset_left = 28.0
+offset_top = 81.0
+offset_right = 462.0
+offset_bottom = 579.0
+script = ExtResource("1_m01vt")
+
+[node name="Output" type="RichTextLabel" parent="Control"]
+offset_left = 648.0
+offset_top = 78.0
+offset_right = 1117.0
+offset_bottom = 614.0
+bbcode_enabled = true
+text = "[i] CHICKEN [/i]"
+scroll_following = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamMicrophone_6bomn")
+autoplay = true
+bus = &"Record"
+
+[connection signal="request_completed" from="HTTPRequest" to="." method="_on_http_request_request_completed"]
+[connection signal="transcribed_msg" from="SpeechToText" to="Control/Input" method="_on_speech_to_text_transcribed_msg"]
+[connection signal="item_selected" from="Control/Audio" to="." method="_on_audio_item_selected"]
+[connection signal="pressed" from="Control/Submit" to="." method="_on_submit_pressed"]
+[connection signal="pressed" from="Control/Clear" to="." method="_on_clear_pressed"]
