@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://uck7wynv6wx6"]
+[gd_scene load_steps=5 format=3 uid="uid://uck7wynv6wx6"]
 
 [ext_resource type="Script" uid="uid://cvu2s16paedud" path="res://gui.gd" id="1_80edf"]
-[ext_resource type="Texture2D" uid="uid://cpk78l0meduw1" path="res://icon.svg" id="2_6lon5"]
+[ext_resource type="Texture2D" uid="uid://cjw86movvonj5" path="res://home-icon-silhouette-svgrepo-com.svg" id="2_q8o8l"]
+[ext_resource type="Texture2D" uid="uid://cakq5sta0nrrp" path="res://cross-svgrepo-com.svg" id="3_cor1f"]
 [ext_resource type="LabelSettings" uid="uid://cg47jsd6lsn52" path="res://LS.tres" id="3_q8o8l"]
 
 [node name="GUI" type="Control"]
@@ -26,11 +27,7 @@ offset_top = -136.0
 offset_right = 68.0
 grow_horizontal = 2
 grow_vertical = 0
-columns = 2
-
-[node name="Button" type="Button" parent="GridContainer"]
-layout_mode = 2
-icon = ExtResource("2_6lon5")
+columns = 3
 
 [node name="LS" type="Label" parent="."]
 visible = false
@@ -74,4 +71,102 @@ label_settings = ExtResource("3_q8o8l")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[connection signal="pressed" from="GridContainer/Button" to="." method="_on_button_pressed"]
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Input" type="RichTextLabel" parent="HBoxContainer/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 4.0
+
+[node name="Submit" type="Button" parent="HBoxContainer/Panel/VBoxContainer/Input"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+flat = true
+
+[node name="Clear" type="Button" parent="HBoxContainer/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+icon = ExtResource("3_cor1f")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Control" type="Control" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 8.0
+
+[node name="Button" type="Button" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+icon = ExtResource("2_q8o8l")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="Panel2" type="Panel" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Panel2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Input" type="RichTextLabel" parent="HBoxContainer/Panel2/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="Submit" type="Button" parent="HBoxContainer/Panel2/VBoxContainer/Input"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+flat = true
+
+[node name="Clear" type="Button" parent="HBoxContainer/Panel2/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+icon = ExtResource("3_cor1f")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/Input/Submit" to="." method="_on_submit_pressed"]
+[connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/Clear" to="." method="_on_clear_pressed"]
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/Panel2/VBoxContainer/Input/Submit" to="." method="_on_submit_pressed_right"]
+[connection signal="pressed" from="HBoxContainer/Panel2/VBoxContainer/Clear" to="." method="_on_clear_pressed_right"]

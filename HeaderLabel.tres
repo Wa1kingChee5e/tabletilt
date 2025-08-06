@@ -1,0 +1,8 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://d4lmfeu3xhnpq"]
+
+[ext_resource type="FontFile" uid="uid://cakqh4snrra6a" path="res://Fonts/static/Comfortaa-Medium.ttf" id="1_mjcyw"]
+
+[resource]
+font = ExtResource("1_mjcyw")
+font_size = 22
+shadow_color = Color(0, 0, 0, 0.690196)

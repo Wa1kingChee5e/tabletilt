@@ -1,9 +1,11 @@
-[gd_scene load_steps=14 format=3 uid="uid://b7suf8grnwcgu"]
+[gd_scene load_steps=17 format=3 uid="uid://b7suf8grnwcgu"]
 
 [ext_resource type="Texture2D" uid="uid://isfgpw1fxa85" path="res://oak_veneer_01_diff_4k.jpg" id="1_e2o6t"]
 [ext_resource type="Script" uid="uid://csi6owilhpheg" path="res://game.gd" id="1_fc0e3"]
 [ext_resource type="Texture2D" uid="uid://bwlkmccajdbdk" path="res://square_tiles_03_ao_4k.png" id="2_e2o6t"]
 [ext_resource type="PackedScene" uid="uid://uck7wynv6wx6" path="res://gui.tscn" id="3_feb5d"]
+[ext_resource type="Script" uid="uid://tj0fay56f463" path="res://addons/godot_whisper/capture_stream_to_text.gd" id="5_ryrav"]
+[ext_resource type="WhisperResource" uid="uid://bo6c3kondu4v" path="res://addons/godot_whisper/models/gglm-tiny.en.bin" id="6_eow3j"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_feb5d"]
 
@@ -41,8 +43,11 @@ albedo_color = Color(1, 0.603922, 1, 1)
 material = SubResource("StandardMaterial3D_eow3j")
 size = Vector2(1, 0.6)
 
+[sub_resource type="AudioStreamMicrophone" id="AudioStreamMicrophone_j5wjh"]
+
 [node name="Game" type="Node3D"]
 script = ExtResource("1_fc0e3")
+speed = 0.02
 
 [node name="Camera" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.280851, 0.959751, 0, -0.959751, 0.280851, 0, 2.93976, 0.917395)
@@ -93,3 +98,21 @@ transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.0
 shaded = true
 double_sided = false
 text = "Text"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamMicrophone_j5wjh")
+autoplay = true
+bus = &"Record"
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
+[node name="SpeechToText" type="SpeechToText" parent="."]
+language_model = ExtResource("6_eow3j")
+script = ExtResource("5_ryrav")
+
+[connection signal="clear_left" from="GUI" to="." method="_on_gui_clear_left"]
+[connection signal="clear_right" from="GUI" to="." method="_on_gui_clear_right"]
+[connection signal="submit_left" from="GUI" to="." method="_on_gui_submit_left"]
+[connection signal="submit_right" from="GUI" to="." method="_on_gui_submit_right"]
+[connection signal="request_completed" from="HTTPRequest" to="." method="_on_http_request_request_completed"]
+[connection signal="transcribed_msg" from="SpeechToText" to="." method="_on_speech_to_text_transcribed_msg"]
